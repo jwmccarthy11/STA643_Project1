@@ -1,0 +1,76 @@
+---
+title: "Project 1 - Helicopters!"
+author: "Jaskaran Singh, Michael Sarkis, Jack McCarthy"
+date: "3/1/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+knitr::opts_chunk$set(echo=TRUE)
+```
+
+# Introduction
+
+The aim of this project is to optimize certain design parameters for the 
+construction of a series of helicopter toys. The ideal result is a helicopter 
+design that maximizes hang-time with minimal variance in the times across drops. 
+However, as the budget is limited for the testing of various designs, we cannot 
+perform more than 100 drops across all candidate designs. It is important that 
+we perform these test drops in as economical a fashion as possible--that is, we 
+would like to extract the most information possible about the effects of 
+specific design decisions from each trial run as we can.
+
+A factorial or fractional factorial experimental design is well-suited to a 
+situation like this. Through this procedure, we may define factors with levels 
+that represent different values of the design parameters of interest. Then, 
+having collected data replicates for each specified combination of factor 
+levels, we may perform an analysis to ascertain the effect of each factor along 
+with the effects of possible interactions between factors. Knowing these effects 
+will allow us to determine the optimal design having maximal hang-time and 
+minimal variance.
+
+# Design
+
+A few test runs were performed to better understand how to make the helicopters 
+and determined what changes to the design might impact the performance. Given 
+the results from these tests, the following factors will considered in the 
+construction of each candidate helicopter design:
+
+|**Factor** |  **Description**  | **Low (-)** | **High (+)** |
+|:---------:|-------------------|-------------|--------------|
+|     A     | Total size        | 6.5"        | 11.0"        |
+|     B     | Blade length      | 4.75"       | 5.75"        |
+|     C     | Blade width       | 2.1"        | 3.0"         |
+|     D     | Stabilizer length | 2.75"       | 4.75"        |
+|     E     | Stabilizer width  | 0.5".        | 1.25"        |
+
+For convenience we are referring to the bottom section of the helicopter that 
+extends downward beneath the blades as the "stabilizer". We also noted during 
+our initial tests that taping the bottom of the stabilizer is universally 
+beneficial to the hang-time and stability of the helicopter. We will therefore 
+being applying tape in all designs.
+
+We have elected to conduct a $2_V^{5-1}$ fractional factorial experiment to 
+analyze the effects of these factors on the hang-time. The generator for this 
+experiment is $I=ABCDE$, which gives the following design table:
+
+| **A** | **B** | **C** | **D** | **E** | 1 | 2 | 3 | 4 | 5 |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| - | - | - | - | + | 5.05 | 3.61 | 4.20 | 4.20 | 4.72 |
+| - | - | - | + | - | 2.84 | 3.94 | 3.30 | 4.45 | 4.39 |
+| - | - | + | - | - | 3.29 | 3.35 | 3.68 | 3.68 | 3.93 |
+| - | - | + | + | + | 4.12 | 3.67 | 4.66 | 3.36 | 4.08 |
+| - | + | - | - | - | 3.35 | 3.74 | 3.55 | 3.93 | 4.21 |
+| - | + | - | + | + | 4.13 | 3.95 | 3.54 | 4.72 | 4.06 |
+| - | + | + | - | + | 3.21 | 3.54 | 3.22 | 3.29 | 4.52 |
+| - | + | + | + | - | 4.39 | 5.31 | 4.32 | 4.85 | 6.16 |
+| + | - | - | - | - | 4.13 | 4.27 | 4.13 | 3.35 | 3.74 |
+| + | - | - | + | + | 3.80 | 3.68 | 3.15 | 3.34 | 3.54 |
+| + | - | + | - | + | 4.08 | 3.87 | 3.55 | 4.32 | 4.07 |
+| + | - | + | + | - | 3.69 | 3.36 | 4.21 | 3.42 | 3.88 |
+| + | + | - | - | + | 5.83 | 5.58 | 5.96 | 6.16 | 6.53 |
+| + | + | - | + | - | 3.84 | 3.62 | 4.72 | 4.66 | 4.26 |
+| + | + | + | - | - | 3.66 | 3.42 | 4.27 | 3.47 | 3.36 |
+| + | + | + | + | + | 3.61 | 3.68 | 4.14 | 4.19 | 3.74 |
