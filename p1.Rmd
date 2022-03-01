@@ -7,7 +7,9 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(matrixStats)
 library(kableExtra)
+library(daewr)
 knitr::opts_chunk$set(echo=TRUE)
 ```
 
@@ -74,3 +76,131 @@ experiment is $I=ABCDE$, which gives the following design table:
 | + | + | - | + | - | 3.84 | 3.62 | 4.72 | 4.66 | 4.26 |
 | + | + | + | - | - | 3.66 | 3.42 | 4.27 | 3.47 | 3.36 |
 | + | + | + | + | + | 3.61 | 3.68 | 4.14 | 4.19 | 3.74 |
+
+```{r}
+flight_data <- read_excel("flight data.xlsx")
+flight_data <- flight_data %>% mutate(ybar = (Time1+Time2+Time3+Time4+Time5)/5)
+flight_data$s = rowVars(as.matrix(flight_data[,c(6,7,8,9,10)]))
+flight_data$lns = log(flight_data$s)
+
+```
+```{r}
+me1 <- flight_data %>% filter(A == "+") %>% select(ybar,lns)
+me2 <-flight_data %>% filter(A == "-") %>% select(ybar,lns)
+
+ybarA <- mean(me1$ybar) - mean(me2$ybar)
+lnsA <- mean(me1$lns) - mean(me2$lns)
+
+me1 <- flight_data %>% filter(B == "+") %>% select(ybar,lns)
+me2 <-flight_data %>% filter(B == "-") %>% select(ybar,lns)
+
+ybarB <- mean(me1$ybar) - mean(me2$ybar)
+lnsB <- mean(me1$lns) - mean(me2$lns)
+
+me1 <- flight_data %>% filter(C == "+") %>% select(ybar,lns)
+me2 <-flight_data %>% filter(C == "-") %>% select(ybar,lns)
+
+ybarC <- mean(me1$ybar) - mean(me2$ybar)
+lnsC <- mean(me1$lns) - mean(me2$lns)
+
+me1 <- flight_data %>% filter(D == "+") %>% select(ybar,lns)
+me2 <-flight_data %>% filter(D == "-") %>% select(ybar,lns)
+
+ybarD <- mean(me1$ybar) - mean(me2$ybar)
+lnsD <- mean(me1$lns) - mean(me2$lns)
+
+me1 <- flight_data %>% filter(E == "+") %>% select(ybar,lns)
+me2 <-flight_data %>% filter(E == "-") %>% select(ybar,lns)
+
+ybarE <- mean(me1$ybar) - mean(me2$ybar)
+lnsE <- mean(me1$lns) - mean(me2$lns)
+```
+
+```{r}
+in1 <- flight_data %>% filter(A == "+",B == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(A == "-",B == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(A == "+",B == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(A == "-",B == "+") %>% select(ybar,lns)
+ybarAB <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsAB <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(A == "+",C == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(A == "-",C == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(A == "+",C == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(A == "-",C == "+") %>% select(ybar,lns)
+ybarAC <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsAC <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(A == "+",D == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(A == "-",D == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(A == "+",D == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(A == "-",D == "+") %>% select(ybar,lns)
+ybarAD <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsAD <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(A == "+",E == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(A == "-",E == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(A == "+",E == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(A == "-",E == "+") %>% select(ybar,lns)
+ybarAE <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsAE <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(B == "+",C == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(B == "-",C == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(B == "+",C == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(B == "-",C == "+") %>% select(ybar,lns)
+ybarBC <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsBC <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(B == "+",D == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(B == "-",D == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(B == "+",D == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(B == "-",D == "+") %>% select(ybar,lns)
+ybarBD <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsBD <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(B == "+",E == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(B == "-",E == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(B == "+",E == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(B == "-",E == "+") %>% select(ybar,lns)
+ybarBE <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsBE <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(C == "+",D == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(C == "-",D == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(C == "+",D == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(C == "-",D == "+") %>% select(ybar,lns)
+ybarCD <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsCD <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+in1 <- flight_data %>% filter(C == "+",E == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(C == "-",E == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(C == "+",E == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(C == "-",E == "+") %>% select(ybar,lns)
+ybarCE <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsCE <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+
+
+in1 <- flight_data %>% filter(D == "+",E == "+") %>% select(ybar,lns)
+in2 <- flight_data %>% filter(D == "-",E == "-") %>% select(ybar,lns)
+in3 <- flight_data %>% filter(D == "+",E == "-") %>% select(ybar,lns)
+in4 <- flight_data %>% filter(D == "-",E == "+") %>% select(ybar,lns)
+ybarDE <- .5*(mean(in1$ybar)+mean(in2$ybar))- .5*(mean(in3$ybar)+mean(in4$ybar))
+lnsDE <- .5*(mean(in1$lns)+mean(in2$lns))- .5*(mean(in3$lns)+mean(in4$lns))
+```
+
+
+```{r}
+lnss <- c(lnsA,lnsB,lnsC,lnsD,lnsE,lnsAB,lnsAC,lnsAD,lnsAE,lnsBC,lnsBD,lnsBE,lnsCD,lnsCE,lnsDE)
+ybars <- c(ybarA,ybarB,ybarC,ybarD,ybarE,ybarAB,ybarAC,ybarAD,ybarAE,ybarBC,ybarBD,ybarBE,ybarCD,ybarCE,ybarDE)
+names(ybars) <-c("A","B","C","D","E","AB","AC","AD","AE","BC","BD","BE","CD","CE","DE")
+names(lnss) <-c("A","B","C","D","E","AB","AC","AD","AE","BC","BD","BE","CD","CE","DE")
+```
+```{r}
+halfnorm(ybars,labs = names(ybar))
+#B nad C appear to be in the top right corner and may be significant
+halfnorm(lnss,labs = names(lnss))
+#A is the highest dispersion and AB is the second highest, but everything appear to be linear
+```
+
+
