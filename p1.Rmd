@@ -11,6 +11,7 @@ library(matrixStats)
 library(kableExtra)
 library(daewr)
 library(readxl)
+library(fdrtool)
 knitr::opts_chunk$set(echo=TRUE)
 ```
 
@@ -166,27 +167,48 @@ labels=c("A",  "B",  "C",  "D",  "E",
 # effect table
 eff.tbl <- tibble(
   label    = labels,
-  loc.eff  = c(lapply(labels[1:5],   flight.main.loc),
-               lapply(labels[6:10],  flight.two.fac.loc),
-               lapply(labels[11:15], flight.two.fac.loc)),
-  disp.eff = c(lapply(labels[1:5],   flight.main.disp),
-               lapply(labels[6:10],  flight.two.fac.disp),
-               lapply(labels[11:15], flight.two.fac.disp))
+  loc.eff  = c(sapply(labels[1:5],   flight.main.loc),
+               sapply(labels[6:10],  flight.two.fac.loc),
+               sapply(labels[11:15], flight.two.fac.loc)),
+  disp.eff = c(sapply(labels[1:5],   flight.main.disp),
+               sapply(labels[6:10],  flight.two.fac.disp),
+               sapply(labels[11:15], flight.two.fac.disp))
 )
 ```
 
-```{r, message=F, warning=F, echo=F}
-# named list location effects
-loc.effs <- unlist(eff.tbl$loc.eff)
-names(loc.effs) <- labels
+```{r}
+eff.tbl %>%
+  mutate(sgn=as.factor(sign(loc.eff)),
+         loc.eff=abs(loc.eff)) %>%
+  arrange(loc.eff) %>%
+  mutate(i=1:nrow(.)) %>%
+  mutate(z=qnorm(((i - 0.5)/nrow(.) + 1)/2)) %>%
+  ggplot(aes(x=z, y=loc.eff)) +
+    geom_point(aes(color=sgn)) +
+    geom_text(aes(label=label),
+              hjust=1, vjust=-0.5) +
+    labs(x="Half-Normal Z-Scores",
+         y="Absolute Location Effects",
+         title="Location Effects Half-Normal Plot",
+         color="Sign of Effect") +
+    scale_color_discrete(labels=c("-", "+")) +
+    theme_bw()
 
-# named list dispersion effects
-disp.effs <- unlist(eff.tbl$disp.eff)
-names(disp.effs) <- labels
-
-# labels only work with named lists :/
-halfnorm(loc.effs, labs=names(loc.effs))
-halfnorm(disp.effs, labs=names(disp.effs))
+eff.tbl %>%
+  mutate(sgn=as.factor(sign(disp.eff)),
+         disp.eff=abs(disp.eff)) %>%
+  arrange(disp.eff) %>%
+  mutate(i=1:nrow(.)) %>%
+  mutate(z=qnorm(((i - 0.5)/nrow(.) + 1)/2)) %>%
+  ggplot(aes(x=z, y=disp.eff)) +
+    geom_point(aes(color=sgn)) +
+    geom_text(aes(label=label),
+              hjust=1, vjust=-0.5) +
+    labs(x="Half-Normal Z-Scores",
+         y="Absolute Dispersion Effects",
+         title="Dispersion Effects Half-Normal Plot",
+         color="Sign of Effect") +
+    scale_color_discrete(labels=c("-", "+")) +
+    theme_bw()
 ```
-
 
