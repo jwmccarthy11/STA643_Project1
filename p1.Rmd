@@ -58,7 +58,9 @@ being applying tape in all designs.
 
 We have elected to conduct a $2_V^{5-1}$ fractional factorial experiment to 
 analyze the effects of these factors on the hang-time. The generator for this 
-experiment is $I=ABCDE$, which gives the following design table:
+experiment is $I=ABCDE$. This resulted in 16 distinct factor combinations with 5 
+replicates for each combination, totaling 80 drops. The combinations and data 
+are given in the following plot:
 
 | **A** | **B** | **C** | **D** | **E** | 1 | 2 | 3 | 4 | 5 |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -79,7 +81,9 @@ experiment is $I=ABCDE$, which gives the following design table:
 | + | + | + | - | - | 3.66 | 3.42 | 4.27 | 3.47 | 3.36 |
 | + | + | + | + | + | 3.61 | 3.68 | 4.14 | 4.19 | 3.74 |
 
-```{r}
+## Analysis
+
+```{r, warning=F}
 data <- read_excel("flight_data.xlsx") %>%
   pivot_longer(r1:r5, names_to="rep", values_to="time") %>%
   mutate_at(.funs=funs(ifelse(.=='+', 1, -1)),
@@ -176,7 +180,7 @@ eff.tbl <- tibble(
 )
 ```
 
-```{r}
+```{r, echo=F}
 eff.tbl %>%
   mutate(sgn=as.factor(sign(loc.eff)),
          loc.eff=abs(loc.eff)) %>%
@@ -211,4 +215,46 @@ eff.tbl %>%
     scale_color_discrete(labels=c("-", "+")) +
     theme_bw()
 ```
+
+```{r}
+loc.all <- abs(eff.tbl$loc.eff)
+cutoff <- 3.75 * median(loc.all)
+int.sub <- loc.all[loc.all <= cutoff]
+pse <- 1.5 * median(int.sub)
+
+lenth.med <- eff.tbl %>%
+  mutate(loc.abs=abs(loc.eff),
+         disp.abs=abs(disp.eff)) %>%
+  mutate(loc.cut=3.75*median(loc.abs),
+         disp.cut=3.75*median(disp.abs)) %>%
+  mutate(loc.inc=ifelse(loc.abs<=loc.cut, T, F),
+         disp.inc=ifelse(disp.abs<=disp.cut, T, F)) %>%
+  filter(loc.inc, disp.inc) %>%
+  summarise(loc.pse=1.5*median(loc.abs),
+            disp.pse=1.5*median(disp.abs)) %>%
+  mutate(ier=2.16)
+
+lenth.tbl <- bind_cols(eff.tbl, lenth.med) %>%
+  mutate(loc.sig=abs(loc.eff)/loc.pse > ier,
+         disp.sig=abs(disp.eff)/disp.pse > ier) %>%
+  mutate(label=labels) %>%
+  select(label, loc.sig, disp.sig)
+
+lenth.tbl %>% kable(col.names=c("Factors", 
+                                "Loc. Significant?", 
+                                "Disp. Significant?"),
+                    align=c('l', 'c', 'c')) %>%
+  kable_styling(position="center") %>%
+  row_spec(0, bold=T)
+```
+
+Testing for significance via Lenth's method, we find that there are no 
+significant effects for location, but **A** and **DE** are significant for 
+dispersion as we originally surmized from the half-normal plots.
+
+## Optimization
+
+An optimal design is one that stays in the air as long as possible with 
+consistency between drops. In more rigorous terms, we want a design that 
+maximizes the expected hang-time while minimizing dispersion.
 
